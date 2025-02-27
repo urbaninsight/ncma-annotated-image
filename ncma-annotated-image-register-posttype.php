@@ -3,7 +3,8 @@
 // Custom Post Type -------------------------------------------------------------------------------------------
 // Following https://kinsta.com/blog/wordpress-custom-post-types/
 
-function ncma_annotated_image_register_post_type() {
+function ncma_annotated_image_register_post_type()
+{
 
     $labels = array(
         'name' => 'Annotated Images',
@@ -19,46 +20,47 @@ function ncma_annotated_image_register_post_type() {
     );
 
     $args = array(
-    'labels' => $labels,
-    'has_archive' => false,
-    'public' => true,
-    'hierarchical' => false,
-    'supports' => array(
-        'title',
-        'custom-fields',
-    ),
-    'rewrite'   => array( 'slug' => 'annotated-image' ),
-    'menu_icon' => 'dashicons-images-alt2',
-    'menu_position' => 30, // for ordering the wp-admin UI menu https://wpbeaches.com/moving-custom-post-types-higher-admin-menu-wordpress-dashboard/
-    'show_in_rest' => true,
+        'labels' => $labels,
+        'has_archive' => false,
+        'public' => true,
+        'hierarchical' => false,
+        'supports' => array(
+            'title',
+            'custom-fields',
+        ),
+        'rewrite'   => array('slug' => 'annotated-image'),
+        'menu_icon' => 'dashicons-images-alt2',
+        'menu_position' => 30, // for ordering the wp-admin UI menu https://wpbeaches.com/moving-custom-post-types-higher-admin-menu-wordpress-dashboard/
+        'show_in_rest' => true,
     );
 
-    register_post_type( 'ncma-annotated-image', $args );
-
+    register_post_type('ncma-annotated-image', $args);
 }
 
-add_action( 'init', 'ncma_annotated_image_register_post_type' );
+add_action('init', 'ncma_annotated_image_register_post_type');
 
 
 // Remove row actions from /wp-admin/edit.php -----------------------------------------------------------------
 
-function kkane_ncma_annotated_image_row_actions( $actions, $post ) {
-    if ( 'ncma-annotated-image' === $post->post_type ) {
-        unset( $actions['inline hide-if-no-js'] ); // Removes the "Quick Edit" action.
-        unset( $actions['view'] ); // Removes the "View" action.
+function kkane_ncma_annotated_image_row_actions($actions, $post)
+{
+    if ('ncma-annotated-image' === $post->post_type) {
+        unset($actions['inline hide-if-no-js']); // Removes the "Quick Edit" action.
+        unset($actions['view']); // Removes the "View" action.
     }
     return $actions;
 }
-add_filter( 'post_row_actions', 'kkane_ncma_annotated_image_row_actions', 10, 2 );
+add_filter('post_row_actions', 'kkane_ncma_annotated_image_row_actions', 10, 2);
 
 
 // Edit form top configuration -----------------------------------------------------------------------------------
 
-function ncma_annotated_image_display_hello( $post ) {
+function ncma_annotated_image_display_hello($post)
+{
     if ($post->post_type != 'ncma-annotated-image') return;
-    echo __( 'Currently, the title below is for naming the label on the previous page only. It does not get published anywhere else.' );
+    echo __('Currently, the title below is for naming the label on the previous page only. It does not get published anywhere else.');
 }
-add_action( 'edit_form_top', 'ncma_annotated_image_display_hello' );
+add_action('edit_form_top', 'ncma_annotated_image_display_hello');
 
 
 // Register ACF field group + fields for ncma-map-location post type. ----------------------------------------
@@ -66,7 +68,7 @@ add_action( 'edit_form_top', 'ncma_annotated_image_display_hello' );
 //  
 // All 'key' values must be globally unique!
 
-if( function_exists('acf_add_local_field_group') ):
+if (function_exists('acf_add_local_field_group')):
 
     // Set post_id for use in field instructions
     // Must set to empty string for when this code runs without any query params, such as on API GET requests
@@ -77,9 +79,9 @@ if( function_exists('acf_add_local_field_group') ):
     }
 
     /* Used to apply field groups below to the ncma-annotated-image post type */
-    $location = array (
-        array (
-            array (
+    $location = array(
+        array(
+            array(
                 'param' => 'post_type',
                 'operator' => '==',
                 'value' => 'ncma-annotated-image',
@@ -204,16 +206,19 @@ if( function_exists('acf_add_local_field_group') ):
                         'key' => 'field_ncma_annotation_es_title',
                         'label' => 'Title (Spanish)',
                         'name' => 'ncma_annotation_es_title',
-                        'type' => 'wysiwyg',
+                        'type' => 'text',
                     ),
                     array(
                         'key' => 'field_ncma_annotation_es_description',
                         'label' => 'Description (Spanish)',
                         'name' => 'ncma_annotation_es_description',
-                        'type' => 'textarea',
-                        'endpoint' => true,
+                        'type' => 'wysiwyg',
                     ),
-                    array('key' => 'field_ncma_annotation_text_tab_endpoint', 'type' => 'tab', 'endpoint' => true),
+                    array(
+                        'key' => 'field_ncma_annotation_text_tab_endpoint',
+                        'type' => 'tab',
+                        'endpoint' => true
+                    ),
 
                     /* Tab Group End Inside Repeater */
                     array(
@@ -245,13 +250,14 @@ endif;
 // acf/update_value/name={$field_name} - filter for a specific field based on it's name
 // So, this happens if the qr_code_image field exists for any post type.
 
-function kkane_ncma_annotated_image_acf_set_featured_image( $value, $post_id, $field  ){
-    
-    if($value != ''){
-	    //Add the value which is the image ID to the _thumbnail_id meta data for the current post
-	    update_post_meta($post_id, '_thumbnail_id', $value);
+function kkane_ncma_annotated_image_acf_set_featured_image($value, $post_id, $field)
+{
+
+    if ($value != '') {
+        //Add the value which is the image ID to the _thumbnail_id meta data for the current post
+        update_post_meta($post_id, '_thumbnail_id', $value);
     }
- 
+
     return $value;
 }
 add_filter('acf/update_value/name=qr_code_image', 'kkane_ncma_annotated_image_acf_set_featured_image', 10, 3);
@@ -262,35 +268,36 @@ add_filter('acf/update_value/name=qr_code_image', 'kkane_ncma_annotated_image_ac
 // https://ryanwelcher.com/2014/10/change-wordpress-post-updated-messages/
 // https://developer.wordpress.org/reference/hooks/post_updated_messages/
 
-function ncma_annotated_image_post_updated_message($messages) {
-    
-	$post             = get_post();
-	$post_type        = get_post_type( $post );
-	$post_type_object = get_post_type_object( $post_type );
-	
-	$messages['ncma-annotated-image'] = array(
-		0  => '', // Unused. Messages start at index 1.
-		1  => __( 'Annotated Image updated.' ),
-		2  => __( 'Custom field updated.' ),
-		3  => __( 'Custom field deleted.'),
-		4  => __( 'Annotated Image updated.' ),
-		/* translators: %s: date and time of the revision */
-		5  => isset( $_GET['revision'] ) ? sprintf( __( 'My Post Type restored to revision from %s' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-		6  => __( 'Annotated Image published.' ),
-		7  => __( 'Annotated Image saved.' ),
-		8  => __( 'Annotated Image submitted.' ),
-		9  => sprintf(
-			__( 'Annotated Image scheduled for: <strong>%1$s</strong>.' ),
-			// translators: Publish box date format, see http://php.net/date
-			date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) )
-		),
-		10 => __( 'Annotated Image draft updated.' )
-	);
+function ncma_annotated_image_post_updated_message($messages)
+{
+
+    $post             = get_post();
+    $post_type        = get_post_type($post);
+    $post_type_object = get_post_type_object($post_type);
+
+    $messages['ncma-annotated-image'] = array(
+        0  => '', // Unused. Messages start at index 1.
+        1  => __('Annotated Image updated.'),
+        2  => __('Custom field updated.'),
+        3  => __('Custom field deleted.'),
+        4  => __('Annotated Image updated.'),
+        /* translators: %s: date and time of the revision */
+        5  => isset($_GET['revision']) ? sprintf(__('My Post Type restored to revision from %s'), wp_post_revision_title((int) $_GET['revision'], false)) : false,
+        6  => __('Annotated Image published.'),
+        7  => __('Annotated Image saved.'),
+        8  => __('Annotated Image submitted.'),
+        9  => sprintf(
+            __('Annotated Image scheduled for: <strong>%1$s</strong>.'),
+            // translators: Publish box date format, see http://php.net/date
+            date_i18n(__('M j, Y @ G:i'), strtotime($post->post_date))
+        ),
+        10 => __('Annotated Image draft updated.')
+    );
 
     //you can also access items this way
     // $messages['post'][1] = "I just totally changed the Updated messages for standards posts";
 
     //return the new messaging 
-	return $messages;
+    return $messages;
 }
-add_filter( 'post_updated_messages', 'ncma_annotated_image_post_updated_message' );
+add_filter('post_updated_messages', 'ncma_annotated_image_post_updated_message');
