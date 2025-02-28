@@ -1,5 +1,9 @@
 <?php
 
+
+/** 
+ * Get Single Annotated Image post by ID
+ **/
 function ui_ncma_annotated_image_data(WP_REST_Request $request)
 {
 
@@ -67,16 +71,13 @@ add_action('rest_api_init', function () {
         ),
     ));
 });
-add_action('rest_api_init', function() {
-    register_rest_route('ncma/v1', 'ncma-annotated-image', array(
-        'methods' => 'GET',
-        'callback' => 'ui_all_ncma_annotated_image_data',
-    ));
-});
 
 
 
-function ui_all_ncma_annotated_image_data( WP_REST_Request $request ) {
+/** 
+ * Get all published Single Annotated Image posts
+ **/
+function ui_ncma_annotated_image_get_all( WP_REST_Request $request ) {
     $query = new WP_Query(array(
         'post_type'      => 'ncma-annotated-image',
         'post_status'    => 'publish',
@@ -100,6 +101,6 @@ function ui_all_ncma_annotated_image_data( WP_REST_Request $request ) {
 add_action('rest_api_init', function() {
     register_rest_route('ncma/v1', 'ncma-annotated-image', array(
         'methods' => 'GET',
-        'callback' => 'ui_all_ncma_annotated_image_data',
+        'callback' => 'ui_ncma_annotated_image_get_all',
     ));
 });
