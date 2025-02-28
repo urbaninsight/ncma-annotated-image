@@ -10,7 +10,9 @@ Author: Urban Insight
 // dirname(__FILE__) represents the current directory
 require_once(dirname(__FILE__) . '/ncma-annotated-image-utilities.php');
 require_once(dirname(__FILE__) . '/ncma-annotated-image-register-posttype.php');
-// require_once(dirname(__FILE__) . '/ncma-annotated-image-rest-api-GET.php');
+require_once(dirname(__FILE__) . '/ncma-annotated-image-rest-api-endpoint.php');
 // require_once(dirname(__FILE__) . '/ncma-annotated-image-rest-api-POST.php');
 require_once(dirname(__FILE__) . '/ncma-annotated-image-clone-post-draft.php');
 require_once(dirname(__FILE__) . '/ncma-annotated-image-update-permalink-slug.php');
+
+require_once(dirname(__FILE__) . '/image-hotspots/acf-image-hotspots.php');

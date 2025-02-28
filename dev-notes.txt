@@ -1,8 +1,0 @@
-1/8
-
-To do
-- Verify behavior of filtering for station, with and without prompts. Can I filter for a prompt without a station?
-- Refactor / Clean up the thickbox modals and document how admin form data gets submitted to the server
-- Add a timestamp to the response table and sort admin page chronologically by default
-- Create rest endpoints to GET and POST responses
-- Stress test the GET endpoint for 3000+ responses

@@ -171,9 +171,12 @@ if (function_exists('acf_add_local_field_group')):
                 'sub_fields' => array(
                     array(
                         'key' => 'field_ncma_annotation_coordinates',
-                        'label' => 'Coordinates',
+                        'label' => 'Annotation Coordinates',
                         'name' => 'ncma_annotation_coordinates',
-                        'type' => 'text',
+                        'type' => 'image_mapping',
+                        'image_field_label' => 'ncma_annotated_image',
+                        'percent_based' => 1,
+                        'font_size' => 14,
                     ),
                     /* Tab Group Start Inside Repeater */
                     array(
