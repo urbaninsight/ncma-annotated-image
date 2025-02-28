@@ -67,9 +67,39 @@ add_action('rest_api_init', function () {
         ),
     ));
 });
-// add_action('rest_api_init', function() {
-//     register_rest_route('ncma/v1', 'ncma-annotated-image', array(
-//         'methods' => 'GET',
-//         'callback' => 'ui_all_ncma_annotated_image_data',
-//     ));
-// });
+add_action('rest_api_init', function() {
+    register_rest_route('ncma/v1', 'ncma-annotated-image', array(
+        'methods' => 'GET',
+        'callback' => 'ui_all_ncma_annotated_image_data',
+    ));
+});
+
+
+
+function ui_all_ncma_annotated_image_data( WP_REST_Request $request ) {
+    $query = new WP_Query(array(
+        'post_type'      => 'ncma-annotated-image',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1, // Get all published posts
+    ));
+
+    $posts = array();
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $post_id = get_the_ID();
+            $request->set_param('id', $post_id); // Set ID for reuse in single post function
+            $posts[] = ui_ncma_annotated_image_data($request)->get_data();
+        }
+        wp_reset_postdata();
+    }
+
+    return rest_ensure_response($posts);
+}
+add_action('rest_api_init', function() {
+    register_rest_route('ncma/v1', 'ncma-annotated-image', array(
+        'methods' => 'GET',
+        'callback' => 'ui_all_ncma_annotated_image_data',
+    ));
+});
