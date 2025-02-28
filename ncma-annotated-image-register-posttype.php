@@ -175,7 +175,7 @@ if (function_exists('acf_add_local_field_group')):
                         'name' => 'ncma_annotation_coordinates',
                         'type' => 'image_mapping',
                         'image_field_label' => 'ncma_annotated_image',
-                        'percent_based' => 1,
+                        'percent_based' => 0,
                         'font_size' => 14,
                     ),
                     /* Tab Group Start Inside Repeater */
