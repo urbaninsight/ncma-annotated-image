@@ -76,7 +76,7 @@ function ui_ncma_annotated_image_get_all( WP_REST_Request $request ) {
             $query->the_post();
             $post_id = get_the_ID();
             $request->set_param('id', $post_id); // Set ID for reuse in single post function
-            $posts[] = ui_ncma_annotated_image_data($request)->get_data();
+            $posts[] = ui_ncma_annotated_image_data_custom($request)->get_data();
         }
         wp_reset_postdata();
     }
