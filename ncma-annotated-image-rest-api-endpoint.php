@@ -83,9 +83,27 @@ function ui_ncma_annotated_image_get_all( WP_REST_Request $request ) {
 
     return rest_ensure_response($posts);
 }
+
+function ui_ncma_annotated_image_get_iiif_manifest(WP_REST_Request $request) {
+    $id = $request->get_param('id');
+    $manifest = generateIIIFManifest($id);
+
+    if (is_wp_error($manifest)) {
+        return $manifest;
+    }
+
+    return rest_ensure_response($manifest);
+}
 add_action('rest_api_init', function() {
     register_rest_route('ncma/v1', 'ncma-annotated-image', array(
         'methods' => 'GET',
         'callback' => 'ui_ncma_annotated_image_get_all',
+    ));
+});
+
+add_action('rest_api_init', function() {
+    register_rest_route('ncma/v1', '/ncma-annotated-image/(?P<id>\d+)/IIIF', array(
+        'methods' => 'GET',
+        'callback' => 'ui_ncma_annotated_image_get_iiif_manifest',
     ));
 });
