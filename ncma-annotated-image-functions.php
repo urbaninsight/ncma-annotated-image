@@ -12,7 +12,7 @@ function save_ncma_annotated_image_json($post_id, $post) {
     
     // Call the function to get the JSON data
     $request = new WP_REST_Request('GET', '/wp/v2/ncma-annotated-image/' . $post_id);
-    $json_data = ui_ncma_annotated_image_data($request);
+    $json_data = ui_ncma_annotated_image_data_custom($request);
     
     if (empty($json_data) || !is_array($json_data)) {
         return;
