@@ -16,3 +16,4 @@ require_once(dirname(__FILE__) . '/ncma-annotated-image-clone-post-draft.php');
 require_once(dirname(__FILE__) . '/ncma-annotated-image-update-permalink-slug.php');
 
 require_once(dirname(__FILE__) . '/image-hotspots/acf-image-hotspots.php');
+require_once(dirname(__FILE__) . '/ncma-annotated-image-functions.php');

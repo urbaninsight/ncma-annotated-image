@@ -175,7 +175,7 @@ if (function_exists('acf_add_local_field_group')):
                         'name' => 'ncma_annotation_coordinates',
                         'type' => 'image_mapping',
                         'image_field_label' => 'ncma_annotated_image',
-                        'percent_based' => 0,
+                        'percent_based' => 1,
                         'font_size' => 14,
                     ),
                     /* Tab Group Start Inside Repeater */
@@ -220,13 +220,17 @@ if (function_exists('acf_add_local_field_group')):
                     array(
                         'key' => 'field_ncma_annotation_text_tab_endpoint',
                         'type' => 'tab',
+                        'endpoint' => 1,
+                    ),
+                    /* Ensure Tabs are Properly Separated */
+                    array(
+                        'key' => 'field_ncma_annotation_text_tab_endpoint2',
+                        'type' => 'tab',
                         'endpoint' => true
                     ),
-
-                    /* Tab Group End Inside Repeater */
                     array(
                         'key' => 'field_ncma_annotation_related_image',
-                        'label' => 'Related Image',
+                        'label' => 'Related Image', 
                         'name' => 'ncma_annotation_related_image',
                         'type' => 'image',
                         'return_format' => 'id',
@@ -234,10 +238,43 @@ if (function_exists('acf_add_local_field_group')):
                         'library' => 'all',
                     ),
                     array(
-                        'key' => 'field_ncma_annotation_related_caption',
-                        'label' => 'Related Image Caption',
-                        'name' => 'ncma_annotation_related_caption',
+                        'key' => 'field_ncma_annotation_text_tab_endpoint3',
+                        'type' => 'tab',
+                        'endpoint' => true
+                    ),
+
+                    
+                    /* Tab Group Start */
+                    array(
+                        'key' => 'field_ncma_annotation_en_tab_related_caption',
+                        'label' => 'English',
+                        'name' => '',
+                        'type' => 'tab',
+                        'placement' => 'top',
+                    ),
+                    array(
+                        'key' => 'field_ncma_annotation_related_caption_en',
+                        'label' => 'Related Image Caption (English)',
+                        'name' => 'ncma_annotation_related_caption_en',
                         'type' => 'text',
+                    ),
+                    array(
+                        'key' => 'field_ncma_annotation_es_tab_caption',
+                        'label' => 'Spanish',
+                        'name' => '',
+                        'type' => 'tab',
+                        'placement' => 'top',
+                    ),
+                    array(
+                        'key' => 'field_ncma_annotation_related_caption_es',
+                        'label' => 'Related Image Caption (Spanish)',
+                        'name' => 'ncma_annotation_related_caption_es',
+                        'type' => 'text',
+                    ),
+                    array(
+                        'key' => 'field_ncma_annotation_caption_tab_endpoint_2',
+                        'type' => 'tab',
+                        'endpoint' => true,
                     ),
                 ),
             ),
