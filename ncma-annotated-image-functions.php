@@ -1,5 +1,7 @@
 <?php
-function save_ncma_annotated_image_json($post_id, $post) {
+function save_ncma_annotated_image_json($post_id) {
+    // Get the post object
+    $post = get_post($post_id);
     // Ensure we're only working with the correct post type
     if ($post->post_type !== 'ncma-annotated-image') {
         return;
@@ -11,10 +13,10 @@ function save_ncma_annotated_image_json($post_id, $post) {
     }
     
     // Call the function to get the JSON data
-    $request = new WP_REST_Request('GET', '/wp/v2/ncma-annotated-image/' . $post_id);
-    $json_data = ui_ncma_annotated_image_data_custom($request);
-    
-    if (empty($json_data) || !is_array($json_data)) {
+    $json_data = generateIIIFManifest($post_id);
+    //error_log(json_encode($json_data));
+    if (empty($json_data)) {
+        error_log('NCMA: Problem with JSON data :(');
         return;
     }
     
@@ -33,8 +35,9 @@ function save_ncma_annotated_image_json($post_id, $post) {
     
     // Write the JSON data to the file
     file_put_contents($json_file, $json_content);
+    error_log('NCMA: JSON file saved: ' . $json_file);
 }
-add_action('save_post_ncma-annotated-image', 'save_ncma_annotated_image_json', 10, 2);
+add_action('acf/save_post', 'save_ncma_annotated_image_json', 20, 1);
 
 function transformAnnotations($acf_fields) {
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
@@ -76,3 +79,77 @@ function ui_get_image_urls_from_id($image_id) {
     
     return $image_urls;
 }
+
+function generateIIIFManifest($post_id) {
+    $post = get_post($post_id);
+    if (!$post) {
+        return new WP_Error('not_found', 'Post not found', array('status' => 404));
+    }
+
+    $acf_fields = function_exists('get_fields') ? get_fields($post_id) : [];
+    $manifest_url = get_site_url() . "/wp-content/uploads/IIIF/ncma-annotated-image/{$post_id}.json";
+
+    $manifest = [
+        "@context" => "http://iiif.io/api/presentation/3/context.json",
+        "id" => $manifest_url,
+        "type" => "Manifest",
+        "label" => [
+            "en" => [$acf_fields['ncma_annotated_image_title']],
+            "es" => [$acf_fields['ncma_annotated_image_title_es'] ?? '']
+        ],
+        "summary" => [
+            "en" => [$acf_fields['ncma_annotated_image_en_description']],
+            "es" => [$acf_fields['ncma_annotated_image_es_description'] ?? '']
+        ],
+        "items" => transformAnnotationsForIIIF($acf_fields)
+    ];
+
+    return rest_ensure_response($manifest);
+}
+
+function transformAnnotationsForIIIF($acf_fields) {
+    $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
+
+    return array_map(function ($annotation) {
+        $annotation_item = [
+            "id" => $annotation['ncma_annotation_coordinates'] ?? null,
+            "type" => "Annotation",
+            "motivation" => "commenting",
+            "body" => []
+        ];
+
+        if (!empty($annotation['ncma_annotation_en_description']) || !empty($annotation['ncma_annotation_es_description'])) {
+            $annotation_item['body'][] = [
+                "type" => "TextualBody",
+                "value" => [
+                    "en" => $annotation['ncma_annotation_en_description'] ?? '',
+                    "es" => $annotation['ncma_annotation_es_description'] ?? ''
+                ],
+                "format" => "text/plain"
+            ];
+        }
+
+        if (!empty($annotation['ncma_annotation_related_image'])) {
+            $annotation_item['body'][] = [
+                "type" => "Image",
+                "id" => $annotation['ncma_annotation_related_image'],
+                "format" => "image/jpeg"
+            ];
+        }
+
+        if (!empty($annotation['ncma_annotation_related_caption_en']) || !empty($annotation['ncma_annotation_related_caption_es'])) {
+            $annotation_item['body'][] = [
+                "type" => "TextualBody",
+                "value" => [
+                    "en" => $annotation['ncma_annotation_related_caption_en'] ?? '',
+                    "es" => $annotation['ncma_annotation_related_caption_es'] ?? ''
+                ],
+                "format" => "text/plain"
+            ];
+        }
+
+        $annotation_item["target"] = "#" . ($annotation['ncma_annotation_coordinates'] ?? 'unknown');
+
+        return $annotation_item;
+    }, $annotations);
+} ?>
