@@ -36,7 +36,7 @@ function ui_ncma_annotated_image_data_custom(WP_REST_Request $request)
             'en' => $acf_fields['ncma_annotated_image_en_description'],
             'es' => $acf_fields['ncma_annotated_image_es_description'],),
         'image' => ui_get_image_urls_from_id($acf_fields['ncma_annotated_image'] ?? null),
-        'image_annotations' => transformAnnotations($acf_fields),
+        'image_annotations' => transformAnnotationsForAPIResponse($acf_fields),
     );
 
     return rest_ensure_response($data);

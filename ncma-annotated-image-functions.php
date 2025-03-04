@@ -1,5 +1,5 @@
 <?php
-function save_ncma_annotated_image_json($post_id) {
+function save_ncma_annotated_image_iiif_manifest_json($post_id) {
     // Get the post object
     $post = get_post($post_id);
     // Ensure we're only working with the correct post type
@@ -16,7 +16,6 @@ function save_ncma_annotated_image_json($post_id) {
     $json_data = generateIIIFManifest($post_id);
     //error_log(json_encode($json_data));
     if (empty($json_data)) {
-        error_log('NCMA: Problem with JSON data :(');
         return;
     }
     
@@ -37,9 +36,9 @@ function save_ncma_annotated_image_json($post_id) {
     file_put_contents($json_file, $json_content);
     error_log('NCMA: JSON file saved: ' . $json_file);
 }
-add_action('acf/save_post', 'save_ncma_annotated_image_json', 20, 1);
+add_action('acf/save_post', 'save_ncma_annotated_image_iiif_manifest_json', 20, 1);
 
-function transformAnnotations($acf_fields) {
+function transformAnnotationsForAPIResponse($acf_fields) {
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
     
     return array_map(function ($annotation) {
