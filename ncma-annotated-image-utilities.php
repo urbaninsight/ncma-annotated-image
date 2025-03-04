@@ -1,6 +1,7 @@
 <?php
 
 // Debug ----------------------------------------------------------------------
+// Modified from ncma-digital-label
 
 // Generic function for writing data to wp-content/debug.log file
 function ncma_annotated_image_write_log( $log ) {

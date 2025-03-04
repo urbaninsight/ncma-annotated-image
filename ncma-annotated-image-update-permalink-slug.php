@@ -1,5 +1,5 @@
 <?php
-
+// Modified from ncma-digital-label
 function ncma_annotated_image_update_slug( $data, $postarr ) {
 
     if ($data["post_type"] == "ncma-annotated-image") {

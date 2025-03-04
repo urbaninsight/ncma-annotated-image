@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * Function hooked to run after acf/save_post has saved acf data. 
+ * This function will generate a IIIF Manifest JSON file for the Annotated Image post.
+ * This file will be saved to the uploads directory in a folder named IIIF/ncma-annotated-image/{post_id}.json
+ * @param mixed $post_id
+ * @return void
+ */
 function save_ncma_annotated_image_iiif_manifest_json($post_id) {
     // Get the post object
     $post = get_post($post_id);
@@ -38,6 +46,13 @@ function save_ncma_annotated_image_iiif_manifest_json($post_id) {
 }
 add_action('acf/save_post', 'save_ncma_annotated_image_iiif_manifest_json', 20, 1);
 
+/**
+ * This function takes a full set of ACF fields, finds the annotations list, and transforms it to
+ * match the expected API response format. Most importantly we are replacing image IDs with urls and also
+ * replacing multi-language fields with a single field broken out by language code.
+ * @param mixed $acf_fields
+ * @return array{annotation_coordinates: mixed, annotation_description: array, annotation_related_caption: array, annotation_related_image: array|null, annotation_title: array[]}
+ */
 function transformAnnotationsForAPIResponse($acf_fields) {
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
     
@@ -61,6 +76,11 @@ function transformAnnotationsForAPIResponse($acf_fields) {
     }, $annotations);
 }
 
+/**
+ * Helper function that converts a media ID to an array of image URLs for various sizes.
+ * @param mixed $image_id
+ * @return array|null
+ */
 function ui_get_image_urls_from_id($image_id) {
     if (!$image_id) {
         return null;
@@ -79,6 +99,11 @@ function ui_get_image_urls_from_id($image_id) {
     return $image_urls;
 }
 
+/**
+ * Generates a IIIF Manifest JSON object for a given post ID.
+ * Only works for Annotated Image posts.
+ * @param mixed $post_id
+ */
 function generateIIIFManifest($post_id) {
     $post = get_post($post_id);
     if (!$post) {
@@ -106,6 +131,11 @@ function generateIIIFManifest($post_id) {
     return rest_ensure_response($manifest);
 }
 
+/**
+ * Similar to transformAnnotationsForAPIResponse, but formats for IIIF Manfest
+ * @param mixed $acf_fields
+ * @return array<array[]|array{body: array, id: mixed, motivation: string, type: string>}
+ */
 function transformAnnotationsForIIIF($acf_fields) {
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
 

@@ -1,12 +1,12 @@
 <?php
 
 
+
 /** 
  * Get Single Annotated Image post by ID
  **/
 function ui_ncma_annotated_image_data_custom(WP_REST_Request $request)
 {
-
     $id = $request->get_param('id');
 
     // Return an error if ID is not provided
@@ -42,22 +42,6 @@ function ui_ncma_annotated_image_data_custom(WP_REST_Request $request)
     return rest_ensure_response($data);
 }
 
-add_action('rest_api_init', function () {
-    register_rest_route('ncma/v1', '/ncma-annotated-image/(?P<id>\d+)', array(
-        'methods'  => 'GET',
-        'callback' => 'ui_ncma_annotated_image_data_custom',
-        'args'     => array(
-            'id' => array(
-                'required'          => true,
-                'validate_callback' => function ($param, $request, $key) {
-                    return is_numeric($param);
-                }
-            ),
-        ),
-    ));
-});
-
-
 
 /** 
  * Get all published Single Annotated Image posts
@@ -84,6 +68,10 @@ function ui_ncma_annotated_image_get_all( WP_REST_Request $request ) {
     return rest_ensure_response($posts);
 }
 
+/**
+ * Get IIIF Manfiest JSON for a single Annotated Image post
+ * @param WP_REST_Request $request
+ */
 function ui_ncma_annotated_image_get_iiif_manifest(WP_REST_Request $request) {
     $id = $request->get_param('id');
     $manifest = generateIIIFManifest($id);
@@ -94,6 +82,28 @@ function ui_ncma_annotated_image_get_iiif_manifest(WP_REST_Request $request) {
 
     return rest_ensure_response($manifest);
 }
+
+/**
+ * Register REST API routes
+ */
+
+// .../wp-json/ncma/v1/ncma-annotated-image/{id}
+add_action('rest_api_init', function () {
+    register_rest_route('ncma/v1', '/ncma-annotated-image/(?P<id>\d+)', array(
+        'methods'  => 'GET',
+        'callback' => 'ui_ncma_annotated_image_data_custom',
+        'args'     => array(
+            'id' => array(
+                'required'          => true,
+                'validate_callback' => function ($param, $request, $key) {
+                    return is_numeric($param);
+                }
+            ),
+        ),
+    ));
+});
+
+// .../wp-json/ncma/v1/ncma-annotated-image
 add_action('rest_api_init', function() {
     register_rest_route('ncma/v1', 'ncma-annotated-image', array(
         'methods' => 'GET',
@@ -101,6 +111,7 @@ add_action('rest_api_init', function() {
     ));
 });
 
+// .../wp-json/ncma/v1/ncma-annotated-image/{id}/IIIF
 add_action('rest_api_init', function() {
     register_rest_route('ncma/v1', '/ncma-annotated-image/(?P<id>\d+)/IIIF', array(
         'methods' => 'GET',

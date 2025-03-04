@@ -1,7 +1,6 @@
 <?php
 
-// Custom Post Type -------------------------------------------------------------------------------------------
-// Following https://kinsta.com/blog/wordpress-custom-post-types/
+// Custom Post Type Registration for Annotated Images -------------------------------------------------------
 
 function ncma_annotated_image_register_post_type()
 {
@@ -40,7 +39,7 @@ function ncma_annotated_image_register_post_type()
 add_action('init', 'ncma_annotated_image_register_post_type');
 
 
-// Remove row actions from /wp-admin/edit.php -----------------------------------------------------------------
+// Modified from ncma-digital-label -----------------------------------------------------------------
 
 function kkane_ncma_annotated_image_row_actions($actions, $post)
 {
@@ -63,10 +62,8 @@ function ncma_annotated_image_display_hello($post)
 add_action('edit_form_top', 'ncma_annotated_image_display_hello');
 
 
-// Register ACF field group + fields for ncma-map-location post type. ----------------------------------------
+// Register ACF field group for post type. ----------------------------------------
 // https://www.advancedcustomfields.com/resources/register-fields-via-php/
-//  
-// All 'key' values must be globally unique!
 
 if (function_exists('acf_add_local_field_group')):
 
