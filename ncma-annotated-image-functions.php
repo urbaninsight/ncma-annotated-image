@@ -29,7 +29,6 @@ function save_ncma_annotated_image_iiif_manifest_json($post_id) {
     
     // Convert the data to JSON format
     $json_content = json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    
     // Define the file path
     $upload_dir = wp_upload_dir();
     $json_dir = trailingslashit($upload_dir['basedir']) . 'IIIF/ncma-annotated-image/';
@@ -42,7 +41,6 @@ function save_ncma_annotated_image_iiif_manifest_json($post_id) {
     
     // Write the JSON data to the file
     file_put_contents($json_file, $json_content);
-    error_log('NCMA: JSON file saved: ' . $json_file);
 }
 add_action('acf/save_post', 'save_ncma_annotated_image_iiif_manifest_json', 20, 1);
 
@@ -128,7 +126,7 @@ function generateIIIFManifest($post_id) {
         "items" => transformAnnotationsForIIIF($acf_fields)
     ];
 
-    return rest_ensure_response($manifest);
+    return $manifest;
 }
 
 /**
