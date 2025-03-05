@@ -109,11 +109,22 @@ function generateIIIFManifest($post_id) {
     }
 
     $acf_fields = function_exists('get_fields') ? get_fields($post_id) : [];
-    $manifest_url = get_site_url() . "/wp-content/uploads/IIIF/ncma-annotated-image/{$post_id}.json";
+
+    // Use a base URI for clean identifiers
+    $base_uri = get_site_url() . "/iiif/ncma-annotated-image/{$post_id}";
+
+    // Retrieve image ID from ACF
+    $image_id = $acf_fields['ncma_annotated_image'] ?? null;
+    $image_url = $image_id ? wp_get_attachment_url($image_id) : '';
+
+    // Get image metadata (width & height)
+    $image_meta = $image_id ? wp_get_attachment_metadata($image_id) : [];
+    $image_width = $image_meta['width'] ?? 0;
+    $image_height = $image_meta['height'] ?? 0;
 
     $manifest = [
         "@context" => "http://iiif.io/api/presentation/3/context.json",
-        "id" => $manifest_url,
+        "id" => $base_uri . "/manifest",
         "type" => "Manifest",
         "label" => [
             "en" => [$acf_fields['ncma_annotated_image_title']],
@@ -123,28 +134,102 @@ function generateIIIFManifest($post_id) {
             "en" => [$acf_fields['ncma_annotated_image_en_description']],
             "es" => [$acf_fields['ncma_annotated_image_es_description'] ?? '']
         ],
-        "items" => transformAnnotationsForIIIF($acf_fields)
+        "items" => []
     ];
+
+    // Construct the Canvas
+    $canvas = [
+        "id" => $base_uri . "/canvas",
+        "type" => "Canvas",
+        "width" => $image_width,
+        "height" => $image_height,
+        "items" => [
+            [
+                "id" => $base_uri . "/canvas/annotation_page",
+                "type" => "AnnotationPage",
+                "items" => [
+                    [
+                        "id" => $base_uri . "/canvas/painting",
+                        "type" => "Annotation",
+                        "motivation" => "painting",
+                        "body" => [
+                            "id" => $image_url,
+                            "type" => "Image",
+                            "format" => "image/jpeg",
+                            "width" => $image_width,
+                            "height" => $image_height
+                        ],
+                        "target" => $base_uri . "/canvas"
+                    ]
+                ]
+            ]
+        ],
+        "annotations" => transformAnnotationsForIIIF($acf_fields, $base_uri, $image_width, $image_height)
+    ];
+
+    $manifest["items"][] = $canvas;
 
     return $manifest;
 }
 
 /**
- * Similar to transformAnnotationsForAPIResponse, but formats for IIIF Manfest
- * @param mixed $acf_fields
- * @return array<array[]|array{body: array, id: mixed, motivation: string, type: string>}
+ * Converts a percentage string to a pixel value based on the given dimension.
+ *
+ * @param string $percent The percentage string (e.g., "45%").
+ * @param int $dimension The total dimension (width or height) in pixels.
+ * @return int The computed pixel value.
  */
-function transformAnnotationsForIIIF($acf_fields) {
+function convertPercentToPixel($percent, $dimension) {
+    $percent_value = floatval(str_replace('%', '', $percent));
+    return round(($percent_value / 100) * $dimension);
+}
+
+/**
+ * Parses a coordinate string like '24.123%,75.001%' into pixel values.
+ *
+ * @param string $coordinate_string The coordinate string from ACF.
+ * @param int    $canvas_width      The width of the canvas in pixels.
+ * @param int    $canvas_height     The height of the canvas in pixels.
+ * @return array Associative array with 'x' and 'y' pixel values.
+ */
+function parseCoordinates($coordinate_string, $canvas_width, $canvas_height) {
+    $coordinates = explode(',', $coordinate_string);
+    $x_percent = trim($coordinates[0] ?? '0%');
+    $y_percent = trim($coordinates[1] ?? '0%');
+
+    return [
+        'x' => convertPercentToPixel($x_percent, $canvas_width),
+        'y' => convertPercentToPixel($y_percent, $canvas_height)
+    ];
+}
+
+/**
+ * Transforms annotations stored in ACF fields into IIIF-compliant annotation objects.
+ *
+ * @param array  $acf_fields    The ACF fields from the post.
+ * @param string $base_uri      The base URI for generating unique identifiers.
+ * @param int    $canvas_width  The width of the canvas (image).
+ * @param int    $canvas_height The height of the canvas (image).
+ * @return array An array of annotation objects.
+ */
+function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $canvas_height) {
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
 
-    return array_map(function ($annotation) {
+    return array_map(function ($annotation) use ($base_uri, $canvas_width, $canvas_height) {
+        // Parse coordinate string into x and y pixel values
+        $coordinates = parseCoordinates($annotation['ncma_annotation_coordinates'] ?? '0%,0%', $canvas_width, $canvas_height);
+        $x = $coordinates['x'];
+        $y = $coordinates['y'];
+
+        // Create a unique ID for the annotation based on its pixel coordinates.
         $annotation_item = [
-            "id" => $annotation['ncma_annotation_coordinates'] ?? null,
+            "id" => "{$base_uri}/annotation/{$x},{$y}",
             "type" => "Annotation",
             "motivation" => "commenting",
             "body" => []
         ];
 
+        // Add textual description if available.
         if (!empty($annotation['ncma_annotation_en_description']) || !empty($annotation['ncma_annotation_es_description'])) {
             $annotation_item['body'][] = [
                 "type" => "TextualBody",
@@ -156,14 +241,25 @@ function transformAnnotationsForIIIF($acf_fields) {
             ];
         }
 
+        // If there is a related image stored as an attachment ID, retrieve its URL and metadata.
         if (!empty($annotation['ncma_annotation_related_image'])) {
-            $annotation_item['body'][] = [
-                "type" => "Image",
-                "id" => $annotation['ncma_annotation_related_image'],
-                "format" => "image/jpeg"
-            ];
+            $attachment_id = $annotation['ncma_annotation_related_image'];
+            $image_url = wp_get_attachment_url($attachment_id);
+            $image_meta = wp_get_attachment_metadata($attachment_id);
+            $img_width = $image_meta['width'] ?? 0;
+            $img_height = $image_meta['height'] ?? 0;
+            if ($image_url) {
+                $annotation_item['body'][] = [
+                    "type" => "Image",
+                    "id" => $image_url,
+                    "format" => "image/jpeg",
+                    "width" => $img_width,
+                    "height" => $img_height
+                ];
+            }
         }
 
+        // Add a related caption if available.
         if (!empty($annotation['ncma_annotation_related_caption_en']) || !empty($annotation['ncma_annotation_related_caption_es'])) {
             $annotation_item['body'][] = [
                 "type" => "TextualBody",
@@ -175,8 +271,17 @@ function transformAnnotationsForIIIF($acf_fields) {
             ];
         }
 
-        $annotation_item["target"] = "#" . ($annotation['ncma_annotation_coordinates'] ?? 'unknown');
+        // Define the target with a PointSelector using the computed x and y pixel values.
+        $annotation_item["target"] = [
+            "source" => $base_uri . "/canvas",
+            "selector" => [
+                "type" => "PointSelector",
+                "x" => $x,
+                "y" => $y
+            ]
+        ];
 
         return $annotation_item;
     }, $annotations);
-} ?>
+}
+?>
