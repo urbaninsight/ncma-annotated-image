@@ -35,14 +35,30 @@ function ui_ncma_annotated_image_data_custom(WP_REST_Request $request)
         'description' => array(
             'en' => $acf_fields['ncma_annotated_image_en_description'],
             'es' => $acf_fields['ncma_annotated_image_es_description'],),
+        'description_image' => ui_get_image_urls_from_id($acf_fields['ncma_annotated_image_description_image']) ?? null, // This can be a URL or an ID depending on how it's set up in ACF
+        'description_video' => $acf_fields['ncma_annotated_image_description_video'] ? ui_ncma_add_video_attributes($acf_fields['ncma_annotated_image_description_video']) : null,
         'image' => ui_get_image_urls_from_id($acf_fields['ncma_annotated_image'] ?? null),
+        'annotation_color' => $acf_fields['ncma_annotation_color'] ?? null,
+        'annotation_highlight_color' => $acf_fields['ncma_annotation_highlight_color'] ?? null,
         'image_annotations' => transformAnnotationsForAPIResponse($acf_fields),
     );
 
     return rest_ensure_response($data);
 }
 
+/**
+ * Get all published Single Annotated Image post IDs
+ **/
+function ui_ncma_annotated_image_get_all_ids( WP_REST_Request $request ) {
+    $query = new WP_Query(array(
+        'post_type'      => 'ncma-annotated-image',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1, // Get all published posts
+        'fields'         => 'ids', // Only return post IDs
+    ));
 
+    return rest_ensure_response($query->posts);
+}
 /** 
  * Get all published Single Annotated Image posts
  **/
@@ -107,7 +123,7 @@ add_action('rest_api_init', function () {
 add_action('rest_api_init', function() {
     register_rest_route('ncma/v1', 'ncma-annotated-image', array(
         'methods' => 'GET',
-        'callback' => 'ui_ncma_annotated_image_get_all',
+        'callback' => 'ui_ncma_annotated_image_get_all_ids',
     ));
 });
 

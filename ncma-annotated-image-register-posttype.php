@@ -100,6 +100,31 @@ if (function_exists('acf_add_local_field_group')):
                 'required' => 1,
                 'conditional_logic' => 0,
             ),
+            array(
+                'key' => 'field_ncma_annotated_image_description_image',
+                'label' => 'Description Image',
+                'name' => 'ncma_annotated_image_description_image', // This is the field name used in the database
+                'type' => 'image',
+                'return_format' => 'id', // or 'url' or 'id'
+                'preview_size' => 'medium',
+                'library' => 'all',
+                'mime_types' => 'jpg,jpeg,png,gif', // Restrict to images
+            ),
+            array(
+                'key' => 'field_ncma_annotated_image_description_video',
+                'label' => 'Description Video',
+                'name' => 'ncma_annotated_image_description_video',
+                'type' => 'oembed', // Allows embedding videos
+                'instructions' => 'Enter a video URL (YouTube, Vimeo, etc.)',
+                'required' => 0,
+                'wrapper' => array(
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ),
+            ),
+
+
 
             /* Tab Group Start for Top-Level Description */
             array(
@@ -134,7 +159,21 @@ if (function_exists('acf_add_local_field_group')):
                 'key' => 'field_ncma_annotated_image_info_text_tab_endpoint',
                 'type' => 'tab',
                 'endpoint' => true,
-            )
+            ),
+            array(
+                'key' => 'field_ncma_annotation_color',
+                'label' => 'Annotation Color',
+                'name' => 'ncma_annotation_color',
+                'type' => 'color_picker',
+                'default_value' => '#ff0000', // Default color (Red)
+            ),
+            array(
+                'key' => 'field_ncma_annotation_highlight_color',
+                'label' => 'Annotation Highlight Color',
+                'name' => 'ncma_annotation_highlight_color',
+                'type' => 'color_picker',
+                'default_value' => '#F9CF48', // Default color (Yellow)
+            ),
             /* Tab Group End */
 
             /* Additional fields can be placed here after the tab groups */
