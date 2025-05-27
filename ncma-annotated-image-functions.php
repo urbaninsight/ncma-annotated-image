@@ -267,12 +267,14 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
         if (!empty($annotation['ncma_annotation_en_description'])) {
             $annotation_item['body'][] = [
                 "type" => "TextualBody",
+                "label" => $annotation['ncma_annotation_en_title'],
                 "value" => $annotation['ncma_annotation_en_description'],
                 "format" => "text/html",
                 "language" => "en"
             ];
             $annotation_item['body'][] = [
                 "type" => "TextualBody",
+                "label" => $annotation['ncma_annotation_es_title'],
                 "value" => $annotation['ncma_annotation_es_description'],
                 "format" => "text/html",
                 "language" => "es"
