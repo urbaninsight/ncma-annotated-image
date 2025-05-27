@@ -206,6 +206,15 @@ if (function_exists('acf_add_local_field_group')):
                 'button_label' => 'Add Annotation',
                 'sub_fields' => array(
                     array(
+                        'key' => 'field_ncma_annotation_accordion_ui',
+                        'label' => 'Annotation',
+                        'type' => 'accordion',
+                        'open' => 0,
+                        'multi_expand' => 0,
+                        'endpoint' => 0,
+                    ),
+            
+                    array(
                         'key' => 'field_ncma_annotation_coordinates',
                         'label' => 'Annotation Coordinates',
                         'name' => 'ncma_annotation_coordinates',
@@ -214,7 +223,7 @@ if (function_exists('acf_add_local_field_group')):
                         'percent_based' => 1,
                         'font_size' => 14,
                     ),
-                    /* Tab Group Start Inside Repeater */
+            
                     array(
                         'key' => 'field_ncma_annotation_en_tab',
                         'label' => 'English',
@@ -232,8 +241,9 @@ if (function_exists('acf_add_local_field_group')):
                         'key' => 'field_ncma_annotation_en_description',
                         'label' => 'Description (English)',
                         'name' => 'ncma_annotation_en_description',
-                        'type' => 'wysiwyg',
+                        'type' => 'textarea',
                     ),
+            
                     array(
                         'key' => 'field_ncma_annotation_es_tab',
                         'label' => 'Spanish',
@@ -251,36 +261,36 @@ if (function_exists('acf_add_local_field_group')):
                         'key' => 'field_ncma_annotation_es_description',
                         'label' => 'Description (Spanish)',
                         'name' => 'ncma_annotation_es_description',
-                        'type' => 'wysiwyg',
+                        'type' => 'textarea',
                     ),
+            
                     array(
                         'key' => 'field_ncma_annotation_text_tab_endpoint',
                         'type' => 'tab',
                         'endpoint' => 1,
                     ),
-                    /* Ensure Tabs are Properly Separated */
                     array(
                         'key' => 'field_ncma_annotation_text_tab_endpoint2',
                         'type' => 'tab',
-                        'endpoint' => true
+                        'endpoint' => true,
                     ),
+            
                     array(
                         'key' => 'field_ncma_annotation_related_image',
-                        'label' => 'Related Image', 
+                        'label' => 'Related Image',
                         'name' => 'ncma_annotation_related_image',
                         'type' => 'image',
                         'return_format' => 'id',
                         'preview_size' => 'medium',
                         'library' => 'all',
                     ),
+            
                     array(
                         'key' => 'field_ncma_annotation_text_tab_endpoint3',
                         'type' => 'tab',
-                        'endpoint' => true
+                        'endpoint' => true,
                     ),
-
-                    
-                    /* Tab Group Start */
+            
                     array(
                         'key' => 'field_ncma_annotation_en_tab_related_caption',
                         'label' => 'English',
@@ -294,6 +304,7 @@ if (function_exists('acf_add_local_field_group')):
                         'name' => 'ncma_annotation_related_caption_en',
                         'type' => 'text',
                     ),
+            
                     array(
                         'key' => 'field_ncma_annotation_es_tab_caption',
                         'label' => 'Spanish',
@@ -307,6 +318,7 @@ if (function_exists('acf_add_local_field_group')):
                         'name' => 'ncma_annotation_related_caption_es',
                         'type' => 'text',
                     ),
+            
                     array(
                         'key' => 'field_ncma_annotation_caption_tab_endpoint_2',
                         'type' => 'tab',
@@ -314,6 +326,7 @@ if (function_exists('acf_add_local_field_group')):
                     ),
                 ),
             ),
+            
         ),
         'location' => $location
     ));

@@ -60,7 +60,7 @@ function ui_ncma_annotated_image_get_all_ids( WP_REST_Request $request ) {
     return rest_ensure_response($query->posts);
 }
 /** 
- * Get all published Single Annotated Image posts
+ * Get all published Single Annotated Image posts, returns array of IDs
  **/
 function ui_ncma_annotated_image_get_all( WP_REST_Request $request ) {
     $query = new WP_Query(array(

@@ -7,9 +7,10 @@
  * @param mixed $acf_fields
  * @return array{annotation_coordinates: mixed, annotation_description: array, annotation_related_caption: array, annotation_related_image: array|null, annotation_title: array[]}
  */
-function transformAnnotationsForAPIResponse($acf_fields) {
+function transformAnnotationsForAPIResponse($acf_fields)
+{
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
-    
+
     return array_map(function ($annotation) {
         return [
             'annotation_coordinates' => $annotation['ncma_annotation_coordinates'] ?? null,
@@ -31,34 +32,12 @@ function transformAnnotationsForAPIResponse($acf_fields) {
 }
 
 /**
- * Helper function that converts a media ID to an array of image URLs for various sizes.
- * @param mixed $image_id
- * @return array|null
- */
-function ui_get_image_urls_from_id($image_id) {
-    if (!$image_id) {
-        return null;
-    }
-    
-    $image_sizes = ['thumbnail', 'medium', 'medium_large', 'large', 'full'];
-    $image_urls = [];
-    
-    foreach ($image_sizes as $size) {
-        $image_url = wp_get_attachment_image_url($image_id, $size);
-        if ($image_url) {
-            $image_urls[$size] = $image_url;
-        }
-    }
-    
-    return $image_urls;
-}
-
-/**
  * Generates a IIIF Manifest JSON object for a given post ID.
  * Only works for Annotated Image posts.
  * @param mixed $post_id
  */
-function generateIIIFManifest($post_id) {
+function generateIIIFManifest($post_id)
+{
     $post = get_post($post_id);
     if (!$post) {
         return new WP_Error('not_found', 'Post not found', array('status' => 404));
@@ -73,16 +52,13 @@ function generateIIIFManifest($post_id) {
     $image_id = $acf_fields['ncma_annotated_image'] ?? null;
     $image_url = $image_id ? wp_get_attachment_url($image_id) : '';
 
-    //wp_update_attachment_metadata($image_id, wp_generate_attachment_metadata($image_id, get_attached_file($image_id)));
+    //wp_update_attachment_metadata($image_id, wp_generate_attachment_metadata($image_id, get_attached_file($image_id))); // uncomment if we have trouble with image meta populating
 
     // Get image metadata (width & height)
     $image_meta = $image_id ? wp_get_attachment_metadata($image_id) : [];
-    // $image_info = wp_get_attachment_image_src($image_id, 'full'); // Get the full image source
 
     $image_width = $image_meta['width'] ?? -1;
     $image_height = $image_meta['height'] ?? -1;
-    // $image_width = $image_info ? $image_info[1] : -1; // Width from the image source
-    // $image_height = $image_info ? $image_info[2] : -1; // Width from the image source
 
 
     $manifest = [
@@ -121,12 +97,13 @@ function generateIIIFManifest($post_id) {
                             "format" => "image/jpeg",
                             "width" => $image_width,
                             "height" => $image_height,
-                        ], 
+                        ],
                         "target" => $base_uri . "/canvas"
                     ]
                 ]
             ]
         ],
+        // add annotations
         "annotations" => transformAnnotationsForIIIF($acf_fields, $base_uri, $image_width, $image_height)
     ];
 
@@ -134,62 +111,6 @@ function generateIIIFManifest($post_id) {
 
     return $manifest;
 }
-
-/**
- * Converts a percentage string to a pixel value based on the given dimension.
- *
- * @param string $percent The percentage string (e.g., "45%").
- * @param int $dimension The total dimension (width or height) in pixels.
- * @return int The computed pixel value casted as
- */
-function convertPercentToPixel($percent, $dimension) {
-    $percent_value = floatval(str_replace('%', '', $percent));
-    return round(($percent_value / 100) * $dimension);
-}
-
-/**
- * Parses a coordinate string like '24.123%,75.001%' into pixel values.
- *
- * @param string $coordinate_string The coordinate string from ACF.
- * @param int    $canvas_width      The width of the canvas in pixels.
- * @param int    $canvas_height     The height of the canvas in pixels.
- * @return array Associative array with 'x' and 'y' pixel values.
- */
-function parseCoordinates($coordinate_string, $canvas_width, $canvas_height) {
-    $coordinates = explode(',', $coordinate_string);
-    $x_percent = trim($coordinates[0] ?? '0%');
-    $y_percent = trim($coordinates[1] ?? '0%');
-
-    return [
-        'x' => convertPercentToPixel($x_percent, $canvas_width),
-        'y' => convertPercentToPixel($y_percent, $canvas_height)
-    ];
-}
-
-function ui_ncma_add_video_attributes($iframe) {
- // Use preg_match to find iframe src.
-preg_match('/src="(.+?)"/', $iframe, $matches);
-$src = $matches[1];
-
-// Add extra parameters to src and replace HTML.
-$params = array(
-    'controls'  => 0,
-    'autoplay'  => 1,
-    'muted'   => 1,
-    'loop'      => 1,
-    'background' => 1,
-);
-$new_src = add_query_arg($params, $src);
-$iframe = str_replace($src, $new_src, $iframe);
-
-// Add extra attributes to iframe HTML.
-$attributes = 'frameborder="0"';
-$iframe = str_replace('></iframe>', ' ' . $attributes . '></iframe>', $iframe);
-
-// Display customized HTML.
-return $iframe;
-}
-
 
 /**
  * Transforms annotations stored in ACF fields into IIIF-compliant annotation objects.
@@ -200,7 +121,8 @@ return $iframe;
  * @param int    $canvas_height The height of the canvas (image).
  * @return array An array of annotation objects.
  */
-function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $canvas_height) {
+function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $canvas_height)
+{
     $annotations = $acf_fields['ncma_annotated_image_annotations'] ?? [];
 
     $annotation_items = array_map(function ($annotation) use ($base_uri, $canvas_width, $canvas_height) {
@@ -212,83 +134,40 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
             "id" => "{$base_uri}/annotation/{$x}x{$y}",
             "type" => "Annotation",
             "motivation" => "tagging",
-            // "label" => [
-            //     "en" => [$annotation['ncma_annotation_en_title']],
-            //     "es" => [$annotation['ncma_annotation_es_title'] ?? '']
-            // ],
             "body" => [],
         ];
 
         if (!empty($annotation['ncma_annotation_en_description'])) {
             $annotation_item['body'][] = [
                 "type" => "TextualBody",
-                "label" => $annotation['ncma_annotation_en_title'],
                 "value" => $annotation['ncma_annotation_en_description'],
+                "label" => $annotation['ncma_annotation_en_title'],
                 "format" => "text/html",
                 "language" => "en"
             ];
+        }
+        if (!empty($annotation['ncma_annotation_es_description'])) {
             $annotation_item['body'][] = [
                 "type" => "TextualBody",
-                "label" => $annotation['ncma_annotation_es_title'],
                 "value" => $annotation['ncma_annotation_es_description'],
+                "label" => $annotation['ncma_annotation_es_title'],
                 "format" => "text/html",
                 "language" => "es"
             ];
-            if(!empty($annotation['ncma_annotation_related_image'])){
-                $annotation_item['body'][] = [
-            
-                    "type" => "Image",
-                    "label" => [
-                        "en" => $annotation['ncma_annotation_related_caption_en'],
-                        "es" => $annotation['ncma_annotation_related_caption_es']
-                    ],
-                    "id" => wp_get_attachment_url($annotation['ncma_annotation_related_image']),
-                    "format" => "image/jpeg"
-            ];
-            }
         }
-        // if (!empty($annotation['ncma_annotation_es_description'])) {
-        //     $annotation_item['body'][] = [
-        //         "type" => "TextualBody",
-        //         "value" => $annotation['ncma_annotation_es_description'],
-        //         "format" => "text/plain",
-        //         "language" => "es"
-        //     ];
-        // }
 
         if (!empty($annotation['ncma_annotation_related_image'])) {
-            $attachment_id = $annotation['ncma_annotation_related_image'];
-            $image_url = wp_get_attachment_url($attachment_id);
-            $image_meta = wp_get_attachment_metadata($attachment_id);
-            $img_width = $image_meta['width'] ?? 0;
-            $img_height = $image_meta['height'] ?? 0;
-            if ($image_url) {
-                // $annotation_item['body'][] = [
-                //     "type" => "Image",
-                //     "id" => $image_url,
-                //     "format" => "image/jpeg",
-                //     "width"  => $img_width,
-                //     "height" => $img_height
-                // ];
-            }
-        }
+            $annotation_item['body'][] = [
 
-        // if (!empty($annotation['ncma_annotation_related_caption_en'])) {
-        //     $annotation_item['body'] = array(
-        //         "type" => "TextualBody",
-        //         "value" => $annotation['ncma_annotation_related_caption_en'],
-        //         "format" => "text/plain",
-        //         "language" => "en"
-        //     );
-        // }
-        // if (!empty($annotation['ncma_annotation_related_caption_es'])) {
-        //     $annotation_item['body'][] = [
-        //         "type" => "TextualBody",
-        //         "value" => $annotation['ncma_annotation_related_caption_es'],
-        //         "format" => "text/plain",
-        //         "language" => "es"
-        //     ];
-        // }
+                "type" => "Image",
+                "label" => [
+                    "en" => $annotation['ncma_annotation_related_caption_en'],
+                    "es" => $annotation['ncma_annotation_related_caption_es']
+                ],
+                "id" => wp_get_attachment_url($annotation['ncma_annotation_related_image']),
+                "format" => "image/jpeg"
+            ];
+        }
 
         $annotation_item["target"] = [
             "type" => "SpecificResource",
@@ -312,3 +191,99 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
         ]
     ];
 }
+
+/**
+ * Function hooked to run after acf/save_post has saved acf data. 
+ * This function will generate a IIIF Manifest JSON file for the Annotated Image post.
+ * This file will be saved to the uploads directory in a folder named IIIF/ncma-annotated-image/{post_id}.json
+ * 
+ * @param mixed $post_id
+ * @return void
+ */
+// add_action('acf/save_post', 'save_ncma_annotated_image_iiif_manifest_json', 20, 1); // Uncomment this line to enable the function on ncma-annotated-image save
+function save_ncma_annotated_image_iiif_manifest_json($post_id)
+{
+    // Get the post object
+    $post = get_post($post_id);
+    // Ensure we're only working with the correct post type
+    if ($post->post_type !== 'ncma-annotated-image') {
+        return;
+    }
+
+    // Ensure the post is published
+    if ($post->post_status !== 'publish') {
+        return;
+    }
+
+    // Call the function to get the JSON data
+    $json_data = generateIIIFManifest($post_id);
+    //error_log(json_encode($json_data));
+    if (empty($json_data)) {
+        return;
+    }
+
+    // Convert the data to JSON format
+    $json_content = json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    // Define the file path
+    $upload_dir = wp_upload_dir();
+    $json_dir = trailingslashit($upload_dir['basedir']) . 'IIIF/ncma-annotated-image/';
+    $json_file = $json_dir . $post_id . '.json';
+
+    // Ensure the directory exists
+    if (!file_exists($json_dir)) {
+        wp_mkdir_p($json_dir);
+    }
+
+    // Write the JSON data to the file
+    file_put_contents($json_file, $json_content);
+}
+
+
+/**
+ * Dynamically updates the ACF accordion label for each annotation repeater item
+ * to display the value of the "Title (English)" field (ncma_annotation_en_title).
+ *
+ * This improves admin UX by making it easier to identify collapsed items in long repeaters.
+ *
+ * Works on initial load and when new repeater rows are added.
+ */
+add_action('acf/input/admin_footer', function () {
+    ?>
+    <script>
+    (function($) {
+        function updateAccordionLabels(context) {
+            $(context).find('.acf-field-accordion[data-key="field_ncma_annotation_accordion_ui"]').each(function() {
+                var $accordion = $(this);
+                var $row = $accordion.closest('.acf-row');
+
+                // Watch for changes to the English title field
+                var $titleField = $row.find('[data-key="field_ncma_annotation_en_title"] input');
+                console.log($titleField.val());
+
+                function setLabel() {
+                    var val = $titleField.val();
+                    $accordion.children('.acf-label').find('label').text(val ? val : 'Annotation');
+                }
+
+                // Update on change and load
+                setLabel();
+                $titleField.on('input change', setLabel);
+            });
+        }
+
+        // Initial load
+        $(document).ready(function() {
+            updateAccordionLabels(document);
+        });
+
+        // When new repeater rows are added
+        if (typeof acf !== 'undefined') {
+            acf.addAction('append', function($el) {
+                updateAccordionLabels($el);
+            });
+        }
+    })(jQuery);
+    </script>
+    <?php
+});
+

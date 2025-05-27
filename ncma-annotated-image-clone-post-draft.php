@@ -8,7 +8,6 @@
 // Add the clone link to action list for post_row_actions
 // for "post" and custom post types ('page_row_actions' needed for "page" post type)
 add_filter( 'post_row_actions', 'ncma_annotated_image_clone_post_link', 10, 2 );
-
 function ncma_annotated_image_clone_post_link( $actions, $post ) {
 	// Limit clone action to certain post types
 	if ( 
