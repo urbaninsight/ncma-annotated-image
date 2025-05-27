@@ -322,23 +322,6 @@ if (function_exists('acf_add_local_field_group')):
 endif;
 
 
-// Set the featured image of a post ---------------------------------------------------------------------------
-// acf/update_value/name={$field_name} - filter for a specific field based on it's name
-// So, this happens if the qr_code_image field exists for any post type.
-
-function kkane_ncma_annotated_image_acf_set_featured_image($value, $post_id, $field)
-{
-
-    if ($value != '') {
-        //Add the value which is the image ID to the _thumbnail_id meta data for the current post
-        update_post_meta($post_id, '_thumbnail_id', $value);
-    }
-
-    return $value;
-}
-add_filter('acf/update_value/name=qr_code_image', 'kkane_ncma_annotated_image_acf_set_featured_image', 10, 3);
-
-
 // Modify the default WordPress post updated messages that are displayed --------------------------------------
 // when making changes to a post of the 'ncma-map-artwork' type.
 // https://ryanwelcher.com/2014/10/change-wordpress-post-updated-messages/

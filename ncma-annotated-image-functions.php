@@ -1,49 +1,4 @@
 <?php
-//require_once ABSPATH . 'wp-admin/includes/image.php';
-
-/**
- * Function hooked to run after acf/save_post has saved acf data. 
- * This function will generate a IIIF Manifest JSON file for the Annotated Image post.
- * This file will be saved to the uploads directory in a folder named IIIF/ncma-annotated-image/{post_id}.json
- * @param mixed $post_id
- * @return void
- */
-function save_ncma_annotated_image_iiif_manifest_json($post_id) {
-    // Get the post object
-    $post = get_post($post_id);
-    // Ensure we're only working with the correct post type
-    if ($post->post_type !== 'ncma-annotated-image') {
-        return;
-    }
-    
-    // Ensure the post is published
-    if ($post->post_status !== 'publish') {
-        return;
-    }
-    
-    // Call the function to get the JSON data
-    $json_data = generateIIIFManifest($post_id);
-    //error_log(json_encode($json_data));
-    if (empty($json_data)) {
-        return;
-    }
-    
-    // Convert the data to JSON format
-    $json_content = json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    // Define the file path
-    $upload_dir = wp_upload_dir();
-    $json_dir = trailingslashit($upload_dir['basedir']) . 'IIIF/ncma-annotated-image/';
-    $json_file = $json_dir . $post_id . '.json';
-    
-    // Ensure the directory exists
-    if (!file_exists($json_dir)) {
-        wp_mkdir_p($json_dir);
-    }
-    
-    // Write the JSON data to the file
-    file_put_contents($json_file, $json_content);
-}
-add_action('acf/save_post', 'save_ncma_annotated_image_iiif_manifest_json', 20, 1);
 
 /**
  * This function takes a full set of ACF fields, finds the annotations list, and transforms it to
