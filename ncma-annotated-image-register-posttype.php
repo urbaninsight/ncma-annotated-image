@@ -90,11 +90,21 @@ if (function_exists('acf_add_local_field_group')):
         'title' => 'Annotated Image - Image Info',
         'menu_order' => 0,
         'fields' => array(
+
             /* Title */
             array(
                 'key' => 'field_ncma_annotated_image_title',
-                'label' => 'Title',
+                'label' => 'Title (English)',
                 'name' => 'ncma_annotated_image_title',
+                'type' => 'text',
+                'instructions' => '',
+                'required' => 1,
+                'conditional_logic' => 0,
+            ),
+            array(
+                'key' => 'field_ncma_annotated_image_title_es',
+                'label' => 'Title (Spanish)',
+                'name' => 'ncma_annotated_image_title_es',
                 'type' => 'text',
                 'instructions' => '',
                 'required' => 1,
