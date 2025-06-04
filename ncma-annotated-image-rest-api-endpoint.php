@@ -31,7 +31,10 @@ function ui_ncma_annotated_image_data_custom(WP_REST_Request $request)
     // Structure the response
     $data = array(
         'id'       => $id,
-        'title'    => $acf_fields['ncma_annotated_image_title'],
+        'title'    => array(
+            'en' => $acf_fields['ncma_annotated_image_title'],
+            'es' => $acf_fields['ncma_annotated_image_title_es'] ?? '',
+        ),
         'description' => array(
             'en' => $acf_fields['ncma_annotated_image_en_description'],
             'es' => $acf_fields['ncma_annotated_image_es_description'],),
