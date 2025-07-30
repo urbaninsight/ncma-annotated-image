@@ -69,6 +69,51 @@ function generateIIIFManifest($post_id)
             "en" => [$acf_fields['ncma_annotated_image_title']],
             "es" => [$acf_fields['ncma_annotated_image_title_es'] ?? '']
         ],
+        "metadata" => [ 
+            [
+            "label" => [
+                "en" => "Copyright Statement",
+            ],
+            "value" => [
+                "en" => $acf_fields['ncma_copyright_statement'],
+                ]
+            ],
+            [
+            "label" => [
+                "en" => "Title",
+            ],
+            "value" => [
+                "en" => get_bloginfo('name')
+                ]
+            ],
+            [
+            "label" => [
+                "en" => "Creator",
+            ],
+            "value" => [
+                "en" => $acf_fields['ncma_creator'],
+                ]
+            ],
+            [
+            "label" => [
+                "en" => "Object Number",
+            ],
+            "value" => [
+                "en" => $acf_fields['ncma_object_number'],
+                ]
+            ],
+        ],
+        "rights" => $acf_fields['ncma_rights_url'],
+        "requiredStatement" => [ 
+            "label" => [
+                "en" => "Rights Statement",
+                "es" => "Derechos de autor"
+            ],
+            "value" => [
+                "en" => $acf_fields['ncma_required_statement_en'],
+                "es" => $acf_fields['ncma_required_statement_es']
+                ]
+        ],
         "summary" => [
             "en" => [$acf_fields['ncma_annotated_image_en_description']],
             "es" => [$acf_fields['ncma_annotated_image_es_description'] ?? '']

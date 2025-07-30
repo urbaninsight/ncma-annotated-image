@@ -341,6 +341,82 @@ if (function_exists('acf_add_local_field_group')):
         'location' => $location
     ));
 
+    acf_add_local_field_group(array(
+        'key' => 'annotated-image-iiif-meta',
+        'title' => 'IIIF Meta',
+        'menu_order' => 2,
+        'fields' => array(
+            array(
+                'key' => 'field_ncma_copyright_statement',
+                'label' => 'Copyright Statement',
+                'name' => 'ncma_copyright_statement',
+                'type' => 'text',
+                'instructions' => 'Enter the copyright statement for this image',
+                'required' => 0,
+            ),
+            array(
+                'key' => 'field_ncma_creator',
+                'label' => 'Creator',
+                'name' => 'ncma_creator',
+                'type' => 'text',
+                'instructions' => 'Enter the creator of the image',
+                'required' => 0,
+            ),
+            array(
+                'key' => 'field_ncma_object_number',
+                'label' => 'Object Number',
+                'name' => 'ncma_object_number',
+                'type' => 'text',
+                'instructions' => 'Enter the object number',
+                'required' => 0,
+            ),
+            array(
+                'key' => 'field_ncma_required_statement_en_tab',
+                'label' => 'English',
+                'name' => '',
+                'type' => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key' => 'field_ncma_required_statement_en',
+                'label' => 'Required Statement (English)',
+                'name' => 'ncma_required_statement_en',
+                'type' => 'text',
+                'instructions' => 'Enter any required statement for this image in English',
+                'required' => 0,
+            ),
+            array(
+                'key' => 'field_ncma_required_statement_es_tab',
+                'label' => 'Spanish',
+                'name' => '',
+                'type' => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key' => 'field_ncma_required_statement_es',
+                'label' => 'Required Statement (Spanish)',
+                'name' => 'ncma_required_statement_es',
+                'type' => 'text',
+                'instructions' => 'Enter any required statement for this image in Spanish',
+                'required' => 0,
+            ),
+            array(
+                'key' => 'field_ncma_required_statement_tab_endpoint',
+                'type' => 'tab',
+                'endpoint' => true,
+            ),
+            array(
+                'key' => 'field_ncma_rights_url',
+                'label' => 'Rights URL',
+                'name' => 'ncma_rights_url',
+                'type' => 'url',
+                'instructions' => 'Enter the URL for rights information',
+                'required' => 0,
+            ),
+        ),
+        'location' => $location
+    ));
+
 
 endif;
 
