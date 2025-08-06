@@ -344,7 +344,7 @@ if (function_exists('acf_add_local_field_group')):
     acf_add_local_field_group(array(
         'key' => 'annotated-image-iiif-meta',
         'title' => 'IIIF Meta',
-        'menu_order' => 2,
+        'menu_order' => 20,
         'fields' => array(
             array(
                 'key' => 'field_ncma_copyright_statement',
