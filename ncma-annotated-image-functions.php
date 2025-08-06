@@ -332,3 +332,18 @@ add_action('acf/input/admin_footer', function () {
     <?php
 });
 
+add_action('acf/input/admin_footer', function () {
+    ?>
+    <script>
+    (function($) {
+    console.log('ACF admin footer script loaded');
+        // Wait until ACF has fully loaded
+        acf.addAction('ready', function() {
+            // Collapse meta field group
+            $('#acf-annotated-image-iiif-meta').addClass('closed');
+        });
+    })(jQuery);
+    </script>
+    <?php
+});
+
