@@ -72,15 +72,8 @@ function generateIIIFManifest($post_id)
         "metadata" => [ 
             [
             "label" => [
-                "en" => "Copyright Statement",
-            ],
-            "value" => [
-                "en" => $acf_fields['ncma_copyright_statement'],
-                ]
-            ],
-            [
-            "label" => [
                 "en" => "Title",
+                "es" => "Título"
             ],
             "value" => [
                 "en" => get_bloginfo('name')
@@ -89,6 +82,7 @@ function generateIIIFManifest($post_id)
             [
             "label" => [
                 "en" => "Creator",
+                "es" => "Creador"
             ],
             "value" => [
                 "en" => $acf_fields['ncma_creator'],
@@ -97,6 +91,7 @@ function generateIIIFManifest($post_id)
             [
             "label" => [
                 "en" => "Object Number",
+                "es" => "Número de objeto"
             ],
             "value" => [
                 "en" => $acf_fields['ncma_object_number'],
@@ -106,8 +101,8 @@ function generateIIIFManifest($post_id)
         "rights" => $acf_fields['ncma_rights_url'],
         "requiredStatement" => [ 
             "label" => [
-                "en" => "Rights Statement",
-                "es" => "Derechos de autor"
+                "en" => "Required Statement",
+                "es" => "Declaración requerida"
             ],
             "value" => [
                 "en" => $acf_fields['ncma_required_statement_en'],
@@ -175,6 +170,19 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
         $x = $coordinates['x'];
         $y = $coordinates['y'];
 
+        $annotated_image_accessibility = '';
+        $alt_text_english = get_post_meta($annotation['ncma_annotation_related_image'], '_wp_attachment_image_alt', true) ?? '';
+        $alt_text_spanish = get_field('media_alt_text_es', $annotation['ncma_annotation_related_image']) ?? '';
+        if (!empty($alt_text_english) && !empty($alt_text_spanish)) {
+            $annotated_image_accessibility = $alt_text_english . '|' . $alt_text_spanish;
+        } elseif (!empty($alt_text_english)) {
+            $annotated_image_accessibility = $alt_text_english;
+        } elseif (!empty($alt_text_spanish)) {
+            $annotated_image_accessibility = $alt_text_spanish;
+        } else {
+            $annotated_image_accessibility = '';
+        }
+
         $annotation_item = [
             "id" => "{$base_uri}/annotation/{$x}x{$y}",
             "type" => "Annotation",
@@ -202,8 +210,7 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
         }
 
         if (!empty($annotation['ncma_annotation_related_image'])) {
-            $annotation_item['body'][] = [
-
+            $data = [
                 "type" => "Image",
                 "label" => [
                     "en" => $annotation['ncma_annotation_related_caption_en'],
@@ -212,6 +219,10 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
                 "id" => wp_get_attachment_url($annotation['ncma_annotation_related_image']),
                 "format" => "image/jpeg"
             ];
+            if(!empty($annotated_image_accessibility)) {
+                $data['accessibility'] = $annotated_image_accessibility;
+            }
+            $annotation_item['body'][] = $data;
         }
 
         $annotation_item["target"] = [
@@ -336,7 +347,6 @@ add_action('acf/input/admin_footer', function () {
     ?>
     <script>
     (function($) {
-    console.log('ACF admin footer script loaded');
         // Wait until ACF has fully loaded
         acf.addAction('ready', function() {
             // Collapse meta field group
@@ -346,4 +356,3 @@ add_action('acf/input/admin_footer', function () {
     </script>
     <?php
 });
-

@@ -344,16 +344,8 @@ if (function_exists('acf_add_local_field_group')):
     acf_add_local_field_group(array(
         'key' => 'annotated-image-iiif-meta',
         'title' => 'IIIF Meta',
-        'menu_order' => 20,
+        'menu_order' => 100,
         'fields' => array(
-            array(
-                'key' => 'field_ncma_copyright_statement',
-                'label' => 'Copyright Statement',
-                'name' => 'ncma_copyright_statement',
-                'type' => 'text',
-                'instructions' => 'Enter the copyright statement for this image',
-                'required' => 0,
-            ),
             array(
                 'key' => 'field_ncma_creator',
                 'label' => 'Creator',
@@ -382,7 +374,7 @@ if (function_exists('acf_add_local_field_group')):
                 'label' => 'Required Statement (English)',
                 'name' => 'ncma_required_statement_en',
                 'type' => 'text',
-                'instructions' => 'Enter any required statement for this image in English',
+                'instructions' => 'More information in the official IIIF spec: <a href="https://iiif.io/api/presentation/3.0/#requiredstatement" target="_blank">https://iiif.io/api/presentation/3.0/#requiredstatement</a>',
                 'required' => 0,
             ),
             array(
@@ -397,7 +389,7 @@ if (function_exists('acf_add_local_field_group')):
                 'label' => 'Required Statement (Spanish)',
                 'name' => 'ncma_required_statement_es',
                 'type' => 'text',
-                'instructions' => 'Enter any required statement for this image in Spanish',
+                'instructions' => 'More information in the official IIIF spec: <a href="https://iiif.io/api/presentation/3.0/#requiredstatement" target="_blank">https://iiif.io/api/presentation/3.0/#requiredstatement</a>',
                 'required' => 0,
             ),
             array(
@@ -410,13 +402,43 @@ if (function_exists('acf_add_local_field_group')):
                 'label' => 'Rights URL',
                 'name' => 'ncma_rights_url',
                 'type' => 'url',
-                'instructions' => 'Enter the URL for rights information',
+                'instructions' => 'More information in the official IIIF spec: <a href="https://iiif.io/api/presentation/3.0/#rights" target="_blank">https://iiif.io/api/presentation/3.0/#rights</a>',
                 'required' => 0,
             ),
         ),
         'location' => $location
     ));
 
+    // Media Alt Text field group for attachments
+    acf_add_local_field_group(array(
+        'key' => 'media-alt-text',
+        'title' => 'Media Alt Text',
+        'menu_order' => 200,
+        'fields' => array(
+            array(
+                'key' => 'field_media_alt_text_es',
+                'label' => 'Alt Text (Spanish)',
+                'name' => 'media_alt_text_es',
+                'type' => 'text',
+                'instructions' => 'Enter alternative text for this media item in Spanish',
+                'required' => 1,
+                'wrapper' => array(
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ),
+            ),
+        ),
+        'location' => array(
+            array(
+                array(
+                    'param' => 'attachment',
+                    'operator' => '==',
+                    'value' => 'all',
+                ),
+            ),
+        ),
+    ));
 
 endif;
 
@@ -459,3 +481,4 @@ function ncma_annotated_image_post_updated_message($messages)
     return $messages;
 }
 add_filter('post_updated_messages', 'ncma_annotated_image_post_updated_message');
+
