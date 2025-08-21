@@ -421,7 +421,7 @@ if (function_exists('acf_add_local_field_group')):
                 'name' => 'media_alt_text_es',
                 'type' => 'text',
                 'instructions' => 'Enter alternative text for this media item in Spanish',
-                'required' => 1,
+                'required' => 0,
                 'wrapper' => array(
                     'width' => '',
                     'class' => '',
