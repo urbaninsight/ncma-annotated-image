@@ -442,6 +442,18 @@ if (function_exists('acf_add_local_field_group')):
 
 endif;
 
+/** 
+ * Register "Hotspot Related Image" size (500px by 500px, no crop)
+ */
+add_action( 'after_setup_theme', function() {
+    add_image_size( 'hotspot-related-image', 500, 500, false );
+} );
+// Make the size available in the editor
+add_filter( 'image_size_names_choose', function( $sizes ) {
+    return array_merge( $sizes, array(
+        'hotspot-related-image' => __( 'Hotspot Related Image' ),
+    ) );
+} );
 
 // Modify the default WordPress post updated messages that are displayed --------------------------------------
 // when making changes to a post of the 'ncma-map-artwork' type.

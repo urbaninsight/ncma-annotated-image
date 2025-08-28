@@ -50,7 +50,7 @@ function generateIIIFManifest($post_id)
 
     // Retrieve image ID from ACF
     $image_id = $acf_fields['ncma_annotated_image'] ?? null;
-    $image_url = $image_id ? wp_get_attachment_url($image_id) : '';
+    $image_url = $image_id ? wp_get_attachment_url(attachment_id: $image_id) : '';
 
     //wp_update_attachment_metadata($image_id, wp_generate_attachment_metadata($image_id, get_attached_file($image_id))); // uncomment if we have trouble with image meta populating
 
@@ -216,7 +216,7 @@ function transformAnnotationsForIIIF($acf_fields, $base_uri, $canvas_width, $can
                     "en" => $annotation['ncma_annotation_related_caption_en'],
                     "es" => $annotation['ncma_annotation_related_caption_es']
                 ],
-                "id" => wp_get_attachment_url($annotation['ncma_annotation_related_image']),
+                "id" => wp_get_attachment_image_url($annotation['ncma_annotation_related_image'], 'hotspot-related-image'),
                 "format" => "image/jpeg"
             ];
             if(!empty($annotated_image_accessibility)) {
