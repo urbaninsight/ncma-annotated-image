@@ -2,7 +2,7 @@
 /*
 Plugin Name: NCMA Annotated Image Post Type
 Description: Plugin to register the ncma-annotated-image post type. Makes the ncma-annotated-image post type available, creates its Advanced Custom Fields, and creates a custom endpoint for the REST API.
-Version: 1.3.1
+Version: 1.4
 Author: Urban Insight
 */
 
