@@ -347,6 +347,12 @@ if (function_exists('acf_add_local_field_group')):
         'menu_order' => 100,
         'fields' => array(
             array(
+                'key' => 'field_ncma_title',
+                'label' => 'Title',
+                'name' => 'ncma_title',
+                'type' => 'text',
+            ),
+            array(
                 'key' => 'field_ncma_creator',
                 'label' => 'Creator',
                 'name' => 'ncma_creator',

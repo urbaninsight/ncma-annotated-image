@@ -76,10 +76,10 @@ function generateIIIFManifest($post_id)
                 "es" => "Título"
             ],
             "value" => [
-                "en" => get_bloginfo('name')
-                ]
-            ],
-            [
+                "en" => $acf_fields['ncma_title'] ?? '',
+            ]
+        ],
+        [
             "label" => [
                 "en" => "Creator",
                 "es" => "Creador"
