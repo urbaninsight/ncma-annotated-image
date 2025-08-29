@@ -347,12 +347,6 @@ if (function_exists('acf_add_local_field_group')):
         'menu_order' => 100,
         'fields' => array(
             array(
-                'key' => 'field_ncma_title',
-                'label' => 'Title',
-                'name' => 'ncma_title',
-                'type' => 'text',
-            ),
-            array(
                 'key' => 'field_ncma_creator',
                 'label' => 'Creator',
                 'name' => 'ncma_creator',
@@ -360,6 +354,38 @@ if (function_exists('acf_add_local_field_group')):
                 'instructions' => 'Enter the creator of the image',
                 'required' => 0,
             ),
+            array(
+                'key' => 'field_ncma_title_en_tab',
+                'label' => 'English',
+                'name' => '',
+                'type' => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key' => 'field_ncma_title',
+                'label' => 'Title (English)',
+                'name' => 'ncma_title',
+                'type' => 'text',
+            ),
+            array(
+                'key' => 'field_ncma_title_es_tab',
+                'label' => 'Spanish',
+                'name' => '',
+                'type' => 'tab',
+                'placement' => 'top',
+            ),
+            array(
+                'key' => 'field_ncma_title_es',
+                'label' => 'Title (Spanish)',
+                'name' => 'ncma_title_es',
+                'type' => 'text',
+            ),
+            array(
+                'key' => 'field_ncma_title_tab_endpoint',
+                'type' => 'tab',
+                'endpoint' => true,
+            ),
+
             array(
                 'key' => 'field_ncma_object_number',
                 'label' => 'Object Number',

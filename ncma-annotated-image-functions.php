@@ -77,6 +77,7 @@ function generateIIIFManifest($post_id)
             ],
             "value" => [
                 "en" => $acf_fields['ncma_title'] ?? '',
+                "es" => $acf_fields['ncma_title_es'] ?? ''
             ]
         ],
         [
